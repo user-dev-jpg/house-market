@@ -4,7 +4,11 @@ import { CreateUserDto } from '../users/dto/create-user.dto';
 import { LoginAuthDto } from './dto/login.dto';
 import { Request } from 'express';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
+import {
+  ApiTags, ApiOperation,
+  ApiBearerAuth, ApiBody, ApiBadRequestResponse,
+  ApiUnauthorizedResponse, ApiOkResponse
+} from '@nestjs/swagger';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -14,17 +18,20 @@ export class AuthController {
   @Post('register')
   @ApiBody({ type: CreateUserDto })
   @ApiOperation({ summary: 'Foydalanuvchini ro‘yxatdan o‘tkazish' })
-  @ApiResponse({ status: 201, description: 'Foydalanuvchi muvaffaqiyatli yaratildi.' })
-  @ApiResponse({ status: 400, description: 'Yaroqsiz ma‘lumotlar.' })
+  @ApiOkResponse({ description: 'Foydalanuvchi muvaffaqiyatli yaratildi.' })
+  @ApiBadRequestResponse({ description: 'Yaroqsiz ma‘lumotlar.' })
   create(@Body() createUserDto: CreateUserDto) {
     return this.authService.create(createUserDto);
   }
-  
+
   @Post('login')
-  @ApiBody({ type: LoginAuthDto})
+  @ApiBody({ type: LoginAuthDto })
   @ApiOperation({ summary: 'Foydalanuvchini tizimga kirishi' })
-  @ApiResponse({ status: 200, description: 'Muvaffaqiyatli login.' })
-  @ApiResponse({ status: 401, description: 'Noto‘g‘ri login yoki parol.' })
+  @ApiOkResponse({ description: 'Muvaffaqiyatli login.' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized user!' })
+  @ApiUnauthorizedResponse({ description: 'Incorrect password' })
+  @ApiBadRequestResponse({ description: 'Login yoki email ni biridan foydalaning' })
+  @ApiBadRequestResponse({ description: 'Login yoki email kiriting' })
   login(@Body() loginDto: LoginAuthDto) {
     return this.authService.login(loginDto);
   }
@@ -33,8 +40,8 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Tokenni yangilash' })
-  @ApiResponse({ status: 200, description: 'Token muvaffaqiyatli yangilandi.' })
-  @ApiResponse({ status: 401, description: 'Token yaroqsiz yoki muddati o‘tgan.' })
+  @ApiOkResponse({ description: 'Token muvaffaqiyatli yangilandi.' })
+  @ApiUnauthorizedResponse({ description: 'Token yaroqsiz yoki muddati o‘tgan.' })
   refresh(@Req() req: Request) {
     return this.authService.refresh(req?.user);
   }
