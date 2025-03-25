@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@n
 import { PropertiesService } from './properties.service';
 import { CreatePropertyDto } from './dto/create-property.dto';
 import { UpdatePropertyDto } from './dto/update-property.dto';
-import { ApiBearerAuth, ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { AuthGuard } from 'src/common/guards/role.guard';
 import { Roles } from 'src/decorators/roles.decorator';
@@ -18,6 +18,7 @@ export class PropertiesController {
   @Post()
   @ApiOperation({ description: 'Yangi property' })
   @ApiCreatedResponse({ description: 'yangi property yaratildi' })
+  @ApiBody({ type: CreatePropertyDto })
   @Roles(RolesEnum.ADMIN)
   create(@Body() createPropertyDto: CreatePropertyDto) {
     return this.propertiesService.create(createPropertyDto);
