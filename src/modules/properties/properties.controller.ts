@@ -26,8 +26,8 @@ export class PropertiesController {
 
   @Get('all')
   @Roles(RolesEnum.ADMIN)
-  @ApiOperation({ summary: 'Yangi property' })
-  @ApiOkResponse({ description: 'Barcha property lar' })
+  @ApiOperation({ summary: 'Hamma property lar' })
+  @ApiOkResponse({ description: 'Barcha property lar muvaffaqiyatli olindi' })
   findAll() {
     return this.propertiesService.findAll();
   }
