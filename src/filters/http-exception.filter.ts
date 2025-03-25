@@ -6,7 +6,8 @@ export class NotFoundExceptionFilter implements ExceptionFilter {
   catch(exception: HttpException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
-    const request = ctx.getRequest<Request>();
+    const method = ctx.getRequest<Request>().method
+
 
     const message = exception.message;
 
@@ -14,7 +15,7 @@ export class NotFoundExceptionFilter implements ExceptionFilter {
     if (message.startsWith("Cannot ")) {
       response.status(HttpStatus.METHOD_NOT_ALLOWED).send({
         success: false,
-        message: "Method Not Allowed",
+        message: `Method ${method} Not Allowed`,
       });
       return;
     }
