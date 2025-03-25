@@ -7,7 +7,8 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import {
   ApiTags, ApiOperation,
   ApiBearerAuth, ApiBody, ApiBadRequestResponse,
-  ApiUnauthorizedResponse, ApiOkResponse
+  ApiUnauthorizedResponse, ApiOkResponse,
+  ApiCreatedResponse
 } from '@nestjs/swagger';
 
 @ApiTags('Authentication')
@@ -18,7 +19,7 @@ export class AuthController {
   @Post('register')
   @ApiBody({ type: CreateUserDto })
   @ApiOperation({ summary: 'Foydalanuvchini ro‘yxatdan o‘tkazish' })
-  @ApiOkResponse({ description: 'Foydalanuvchi muvaffaqiyatli yaratildi.' })
+  @ApiCreatedResponse({ description: 'Foydalanuvchi muvaffaqiyatli yaratildi.' })
   @ApiBadRequestResponse({ description: 'Yaroqsiz ma‘lumotlar.' })
   create(@Body() createUserDto: CreateUserDto) {
     return this.authService.create(createUserDto);
