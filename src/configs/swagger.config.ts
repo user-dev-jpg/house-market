@@ -14,8 +14,8 @@ export const SwaggerConfig = (app: INestApplication) => {
 		.setDescription('House market API documentation')
 		.setVersion('1.0')
 		.addTag('House market API')
-		.addServer(`${baseUrl_1}/`, `Dynamic Server`)
-		.addServer(`${baseUrl_2}/`, `Localni Server`)
+		.addServer(`${baseUrl_1}`, `Dynamic Server`)
+		.addServer(`${baseUrl_2}`, `Localni Server`)
 		.addBearerAuth()
 		.build()
 
