@@ -3,18 +3,18 @@ import { IsEmail, IsNotEmpty, IsOptional, IsString, Length, Matches } from "clas
 
 export class LoginAuthDto {
 
-	@ApiPropertyOptional({ example: "jon@example.com", description: "Foydalanuvchi emaili"})
+	@ApiPropertyOptional({ example: "kamina@gmail.com", description: "Foydalanuvchi emaili"})
 	@IsOptional()
 	@IsEmail()
 	email: string;
 
-	@ApiPropertyOptional({ example: "johndoe", description: "Foydalanuvchi logini" })
+	@ApiPropertyOptional({ example: "adminka", description: "Foydalanuvchi logini" })
 	@IsOptional()
 	@IsString()
 	login: string;
 
 	@ApiProperty({
-		example: "Aaa123",
+		example: "Abcd123",
 		description: "Parol 7-15 ta belgidan iborat bo‘lishi kerak. Kamida 1 ta katta harf, 1 ta kichik harf va 1 ta raqam bo‘lishi shart",
 		minLength: 7,
 		maxLength: 15
