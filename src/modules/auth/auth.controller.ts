@@ -4,7 +4,7 @@ import { CreateUserDto } from '../users/dto/create-user.dto';
 import { LoginAuthDto } from './dto/login.dto';
 import { Request } from 'express';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -12,14 +12,16 @@ export class AuthController {
   constructor(private readonly authService: AuthService) { }
 
   @Post('register')
+  @ApiBody({ type: CreateUserDto })
   @ApiOperation({ summary: 'Foydalanuvchini ro‘yxatdan o‘tkazish' })
   @ApiResponse({ status: 201, description: 'Foydalanuvchi muvaffaqiyatli yaratildi.' })
   @ApiResponse({ status: 400, description: 'Yaroqsiz ma‘lumotlar.' })
   create(@Body() createUserDto: CreateUserDto) {
     return this.authService.create(createUserDto);
   }
-
+  
   @Post('login')
+  @ApiBody({ type: LoginAuthDto})
   @ApiOperation({ summary: 'Foydalanuvchini tizimga kirishi' })
   @ApiResponse({ status: 200, description: 'Muvaffaqiyatli login.' })
   @ApiResponse({ status: 401, description: 'Noto‘g‘ri login yoki parol.' })

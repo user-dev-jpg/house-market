@@ -1,4 +1,4 @@
-import { ConflictException, HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ConflictException, HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
 import { User } from '../users/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -67,19 +67,50 @@ export class AuthService {
     refreshExpiresIn: string
   }> {
     try {
-      const user: User = await this.userRepo.findOne({ where: { login: loginDto.login } })
-      if (!user) throw new UnauthorizedException(`Unauthorized user!`)
+      if (loginDto.email && loginDto.login) {
+        throw new BadRequestException(`Login yoki email ni biridan foydalaning`)
+      }
 
-      const checkPassword = await bcryptjs.compare(loginDto.password, user.password)
-      if (!checkPassword) throw new UnauthorizedException(`Incorrect password`)
+      // if email
+      if (loginDto.email) {
 
-      const tokens = await this.tokenService.generator(user)
+        const user: User = await this.userRepo.findOne({ where: { email: loginDto.email } })
+        if (!user) throw new UnauthorizedException(`Unauthorized user!`)
 
-      return {
-        accessToken: tokens.accToken,
-        accessExpiresIn: tokens.accessExpiresIn,
-        refreshToken: tokens.refToken,
-        refreshExpiresIn: tokens.refreshExpiresIn
+        const checkPassword = await bcryptjs.compare(loginDto.password, user.password)
+        if (!checkPassword) throw new UnauthorizedException(`Incorrect password`)
+
+        const tokens = await this.tokenService.generator(user)
+
+        return {
+          accessToken: tokens.accToken,
+          accessExpiresIn: tokens.accessExpiresIn,
+          refreshToken: tokens.refToken,
+          refreshExpiresIn: tokens.refreshExpiresIn
+        }
+      }
+
+      // if login
+      if (loginDto.login) {
+
+        const user: User = await this.userRepo.findOne({ where: { login: loginDto.login } })
+        if (!user) throw new UnauthorizedException(`Unauthorized user!`)
+
+        const checkPassword = await bcryptjs.compare(loginDto.password, user.password)
+        if (!checkPassword) throw new UnauthorizedException(`Incorrect password`)
+
+        const tokens = await this.tokenService.generator(user)
+
+        return {
+          accessToken: tokens.accToken,
+          accessExpiresIn: tokens.accessExpiresIn,
+          refreshToken: tokens.refToken,
+          refreshExpiresIn: tokens.refreshExpiresIn
+        }
+      }
+
+      if (!loginDto.email || !loginDto.login) {
+        throw new BadRequestException(`Login yoki email kiriting`)
       }
     } catch (error: any) {
       throw error instanceof HttpException
