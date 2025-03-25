@@ -24,7 +24,7 @@ export class PropertiesController {
     return this.propertiesService.create(createPropertyDto);
   }
 
-  @Get()
+  @Get('all')
   @Roles(RolesEnum.ADMIN)
   @ApiOperation({ summary: 'Yangi property' })
   @ApiOkResponse({ description: 'Barcha property lar' })
