@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsString, IsNumber, IsArray } from "class-validator";
+import { IsNotEmpty, IsString, IsNumber, IsArray, IsEnum } from "class-validator";
+import { PropertyType } from "src/enums/properties-type.enum";
 import { IProperty } from "src/interfaces/properties.interface";
 
 export class CreatePropertyDto implements Omit<IProperty, 'id'> {
@@ -8,9 +9,11 @@ export class CreatePropertyDto implements Omit<IProperty, 'id'> {
 	@IsString()
 	description: string;
 
-	@ApiProperty({ example: 'House' })
+	@ApiProperty({ example: 'House', description: `Property type`, enum: PropertyType })
 	@IsNotEmpty()
-	@IsString()
+	@IsEnum(PropertyType, {
+		message: `Property types are only: houses, apartments, condos, retail, villas, offices`
+	})
 	type: string;
 
 	@ApiProperty({ example: 3 })

@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { PropertyType } from "src/enums/properties-type.enum";
 import { IProperty } from "src/interfaces/properties.interface";
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
@@ -13,7 +14,7 @@ export class Property implements IProperty {
 	description: string;
 
 	@Column()
-	@ApiProperty({ example: 'House' })
+	@ApiProperty({ example: 'House', description: `Property type`, enum: PropertyType })
 	type: string;
 
 	@Column()
