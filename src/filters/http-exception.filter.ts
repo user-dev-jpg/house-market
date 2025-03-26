@@ -1,4 +1,4 @@
-import { ArgumentsHost, Catch, ExceptionFilter, HttpException, MethodNotAllowedException, NotFoundException, HttpStatus } from "@nestjs/common";
+import { ArgumentsHost, Catch, ExceptionFilter, HttpException, NotFoundException, HttpStatus } from "@nestjs/common";
 import { Response } from "express";
 
 @Catch(NotFoundException)
