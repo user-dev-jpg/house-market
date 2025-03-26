@@ -4,6 +4,8 @@ import { extname } from "path";
 
 @Injectable()
 export class FileUploadservice {
+	
+	// 
 	getMulterConfig() {
 		return {
 
@@ -15,9 +17,5 @@ export class FileUploadservice {
 				},
 			}),
 		}
-	}
-
-	getFileUrl(filename: string): string {
-		return `/uploads/${filename}`;
 	}
 }
