@@ -17,8 +17,8 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) { }
 
   @Get('all')
-  @ApiOperation({ summary: 'Barcha userlarni olish' })
-  @ApiOkResponse({ description: 'User id# bo`yicha muvaffaqiyatli yangilandi' })
+  @ApiOperation({ summary: 'Barcha userlarni olish   (only admin)' })
+  @ApiOkResponse({ description: 'Users data' })
   @ApiForbiddenResponse({ description: `Faqat admin barcha userlarni ola oladi` })
   @Roles(RolesEnum.ADMIN)
   findAll() {
