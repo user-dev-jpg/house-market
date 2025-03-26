@@ -27,7 +27,7 @@ export class UsersController {
 
   @Get('profile')
   @ApiOperation({ summary: 'User profilini olishh' })
-  @ApiOkResponse({ description: 'User id# bo`yicha muvaffaqiyatli yangilandi' })
+  @ApiOkResponse({ description: 'User  profile muvaffaqiyatli yangilandi' })
   profile(@Req() req: Request) {
     delete req?.user.password
 
