@@ -7,7 +7,6 @@ import { UsersModule } from '../users/users.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { FileUploadController } from './file-upload.controller';
-import { FileUploadservice } from './file-upload.service';
 
 @Module({
   imports: [
@@ -21,7 +20,7 @@ import { FileUploadservice } from './file-upload.service';
     }),
   ],
   controllers: [PropertiesController, FileUploadController],
-  providers: [PropertiesService, FileUploadservice],
+  providers: [PropertiesService],
   exports: [PropertiesService, TypeOrmModule.forFeature([Property]),]
 })
 export class PropertiesModule { }
