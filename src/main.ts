@@ -19,7 +19,9 @@ async function bootstrap() {
 
   app.useGlobalFilters(new NotFoundExceptionFilter())
 
-  app.useStaticAssets(join(__dirname, '..', 'uploads'), { prefix: '/uploads' }); const port = configServie.get<number>("PORT")
+  app.useStaticAssets(join(__dirname, '..', 'uploads'), { prefix: '/uploads' });
+
+  const port = configServie.get<number>("PORT")
 
   await app.listen(port, () => {
     console.log(`Server run on port: ${port}`)
