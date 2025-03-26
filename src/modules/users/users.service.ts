@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
@@ -21,21 +21,31 @@ export class UsersService {
       })
     } catch (error) {
       throw error instanceof HttpException
-      ? error
-      : new HttpException(error.message, HttpStatus.BAD_REQUEST)
+        ? error
+        : new HttpException(error.message, HttpStatus.BAD_REQUEST)
 
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  // update user profile
+  async update(id: string, updateUserDto: Omit<UpdateUserDto, "password">): Promise<string> {
+    try {
+      if (!updateUserDto || Object.keys(updateUserDto).length === 0) {
+        throw new BadRequestException('Yangilash uchun biror maydon kiriting')
+      }
+  
+      const updateResult = await this.userRepo.update(id, updateUserDto);
+  
+      if (!updateResult || typeof updateResult.affected !== 'number') {
+        throw new InternalServerErrorException('Update natijasi noma’lum');
+      }
+  
+      return updateResult.affected > 0 ? `Successfully updated` : `Update failed`;
+    } catch (error: any) {
+      throw error instanceof HttpException
+        ? error
+        : new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
-
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
-  }
+  
 }
