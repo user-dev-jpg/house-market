@@ -3,7 +3,7 @@ import { IsEmail, IsNotEmpty, IsOptional, IsString, Length, Matches } from "clas
 
 export class LoginAuthDto {
 
-	@ApiPropertyOptional({ example: "kamina@gmail.com", description: "Foydalanuvchi emaili"})
+	// @ApiPropertyOptional({ example: "kamina@gmail.com", description: "Foydalanuvchi emaili"})
 	@IsOptional()
 	@IsEmail()
 	email: string;

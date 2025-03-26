@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { CreatePropertyDto } from './dto/create-property.dto';
 import { UpdatePropertyDto } from './dto/update-property.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -27,6 +27,7 @@ export class PropertiesService {
     }
   }
 
+  // all propertys  
   async findAll(): Promise<{ propertys: Property[] }> {
     try {
       return { propertys: await this.propertyRepo.find() }
@@ -37,15 +38,56 @@ export class PropertiesService {
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} property`;
+  // get one property by id
+  async findOne(id: string): Promise<{ property: Property }> {
+    try {
+      return { property: await this.propertyRepo.findOne({ where: { id } }) }
+    } catch (error: any) {
+      throw error instanceof HttpException
+        ? error
+        : new HttpException(error.message, HttpStatus.BAD_REQUEST)
+    }
   }
 
-  update(id: number, updatePropertyDto: UpdatePropertyDto) {
-    return `This action updates a #${id} property`;
+
+  // update property
+  async update(id: string, updatePropertyDto: UpdatePropertyDto): Promise<string> {
+    try {
+
+      if (!updatePropertyDto || Object.keys(updatePropertyDto).length === 0) {
+        throw new BadRequestException('yangilash uchun biror maydon kiriting')
+      }
+      const property = await this.propertyRepo.findOne({ where: { id } })
+      if (!property) {
+        throw new NotFoundException('not found property')
+      }
+
+      const { affected } = await this.propertyRepo.update(id, updatePropertyDto)
+
+      return affected && affected > 0 ? `Succfully updated` : `Update filed`
+    } catch (error: any) {
+      throw error instanceof HttpException
+        ? error
+        : new HttpException(error.message, HttpStatus.BAD_REQUEST)
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} property`;
+
+  // delete property
+  async remove(id: string) {
+    try {
+      const property = await this.propertyRepo.findOne({ where: { id } })
+      if (!property) {
+        throw new NotFoundException('not found property')
+      }
+
+      const { affected } = await this.propertyRepo.delete(id)
+
+      return affected && affected > 0 ? `Succfully deleted!` : `Delete filed`
+    } catch (error: any) {
+      throw error instanceof HttpException
+        ? error
+        : new HttpException(error.message, HttpStatus.BAD_REQUEST)
+    }
   }
 }

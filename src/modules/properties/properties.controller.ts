@@ -1,17 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { PropertiesService } from './properties.service';
 import { CreatePropertyDto } from './dto/create-property.dto';
 import { UpdatePropertyDto } from './dto/update-property.dto';
-import { ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { AuthGuard } from 'src/common/guards/role.guard';
 import { Roles } from 'src/decorators/roles.decorator';
 import { RolesEnum } from 'src/enums';
+import { UuidDto } from './dto/uuid.dto';
 
 @ApiTags('Properties')
 @ApiBearerAuth()
 @Controller('propertys')
 @UseGuards(JwtAuthGuard, AuthGuard)
+@Roles(RolesEnum.ADMIN)
 export class PropertiesController {
   constructor(private readonly propertiesService: PropertiesService) { }
 
@@ -19,13 +21,11 @@ export class PropertiesController {
   @ApiOperation({ summary: 'Yangi property' })
   @ApiCreatedResponse({ description: 'yangi property yaratildi' })
   @ApiBody({ type: CreatePropertyDto })
-  @Roles(RolesEnum.ADMIN)
   create(@Body() createPropertyDto: CreatePropertyDto) {
     return this.propertiesService.create(createPropertyDto);
   }
 
   @Get('all')
-  @Roles(RolesEnum.ADMIN)
   @ApiOperation({ summary: 'Hamma property lar' })
   @ApiOkResponse({ description: 'Barcha property lar muvaffaqiyatli olindi' })
   findAll() {
@@ -33,17 +33,30 @@ export class PropertiesController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.propertiesService.findOne(+id);
+  @ApiOperation({ summary: 'Property id# bo`yicha' })
+  @ApiOkResponse({ description: 'Property id# bo`yicha muvaffaqiyatli olindi' })
+  @ApiParam({ name: 'id', example: '123e4567-e89b-12d3-a456-426614174000', description: 'Property UUID' })
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  findOne(@Param() uuidDto: UuidDto) {
+    return this.propertiesService.findOne(uuidDto.id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePropertyDto: UpdatePropertyDto) {
-    return this.propertiesService.update(+id, updatePropertyDto);
+  @ApiOperation({ summary: 'Property id# bo`yicha yangilash' })
+  @ApiOkResponse({ description: 'Property id# bo`yicha muvaffaqiyatli yangilandi' })
+  @ApiBadRequestResponse({description:`Yangilash uchun biror maydon kiriting`})
+  @ApiParam({ name: 'id', example: '123e4567-e89b-12d3-a456-426614174000', description: 'Property UUID' })
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  update(@Param() uuidDto: UuidDto, @Body() updatePropertyDto: UpdatePropertyDto) {
+    return this.propertiesService.update(uuidDto.id, updatePropertyDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.propertiesService.remove(+id);
+  @ApiOperation({ summary: 'Property id# bo`yicha o`chirish' })
+  @ApiOkResponse({ description: 'Property id# bo`yicha muvaffaqiyatli o`chirildi' })
+  @ApiParam({ name: 'id', example: '123e4567-e89b-12d3-a456-426614174000', description: 'Property UUID' })
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  remove(@Param() uuidDto: UuidDto) {
+    return this.propertiesService.remove(uuidDto.id);
   }
 }
