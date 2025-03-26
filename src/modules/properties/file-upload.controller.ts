@@ -31,7 +31,7 @@ export class FileUploadController {
 
 		return {
 			message: "Fayl yuklandi",
-			filePath: `${url}uploads/${file.filename}`,
+			filePath: `${url}/uploads/${file.filename}`,
 		}
 	}
 }
