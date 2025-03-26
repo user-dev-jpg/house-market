@@ -1,4 +1,4 @@
-import { BadRequestException, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreatePropertyDto } from './dto/create-property.dto';
 import { UpdatePropertyDto } from './dto/update-property.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -62,9 +62,13 @@ export class PropertiesService {
         throw new NotFoundException('not found property')
       }
 
-      const { affected } = await this.propertyRepo.update(id, updatePropertyDto)
+      const updateResult = await this.propertyRepo.update(id, updatePropertyDto)
 
-      return affected && affected > 0 ? `Succfully updated` : `Update filed`
+      if (!updateResult || typeof updateResult.affected !== 'number') {
+        throw new InternalServerErrorException('Update natijasi noma’lum');
+      }
+
+      return updateResult.affected > 0 ? `Successfully updated` : `Update failed`;
     } catch (error: any) {
       throw error instanceof HttpException
         ? error

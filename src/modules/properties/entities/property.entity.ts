@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IProperty } from "src/interfaces/properties.interface";
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Property implements IProperty {
@@ -95,4 +95,10 @@ export class Property implements IProperty {
 	@Column()
 	@ApiProperty({ example: '90' })
 	energy_index: string;
+
+	@CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+	createdAt: Date;
+
+	@UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
+	updatedAt: Date;
 }
