@@ -1,8 +1,8 @@
-import { Controller, Post, Body, Req, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Req, UseGuards, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { LoginAuthDto } from './dto/login.dto';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import {
   ApiTags, ApiOperation,
@@ -33,8 +33,9 @@ export class AuthController {
   @ApiUnauthorizedResponse({ description: 'Incorrect password' })
   @ApiBadRequestResponse({ description: 'Login yoki email ni biridan foydalaning' })
   @ApiBadRequestResponse({ description: 'Login yoki email kiriting' })
-  login(@Body() loginDto: LoginAuthDto) {
-    return this.authService.login(loginDto);
+  async login(@Body() loginDto: LoginAuthDto, @Res() res: Response) {
+    const data = await this.authService.login(loginDto)
+    return res.status(200).json(data)
   }
 
   @Post('refresh')
@@ -43,7 +44,8 @@ export class AuthController {
   @ApiOperation({ summary: 'Tokenni yangilash' })
   @ApiOkResponse({ description: 'Token muvaffaqiyatli yangilandi.' })
   @ApiUnauthorizedResponse({ description: 'Token yaroqsiz yoki muddati o‘tgan.' })
-  refresh(@Req() req: Request) {
-    return this.authService.refresh(req?.user);
+  async refresh(@Req() req: Request, @Res() res: Response) {
+    const data = await this.authService.refresh(req?.user);
+    return res.status(200).json(data)
   }
 }
