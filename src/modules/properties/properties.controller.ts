@@ -16,10 +16,11 @@ import { UuidDto } from './dto/uuid.dto';
 @Roles(RolesEnum.ADMIN)
 export class PropertiesController {
   constructor(private readonly propertiesService: PropertiesService) { }
-
+  
   @Post()
   @ApiOperation({ summary: 'Yangi property' })
   @ApiCreatedResponse({ description: 'yangi property yaratildi' })
+  @ApiBadRequestResponse({description:`Kiritilgan malumotlar xatoligi`})
   @ApiBody({ type: CreatePropertyDto })
   create(@Body() createPropertyDto: CreatePropertyDto) {
     return this.propertiesService.create(createPropertyDto);
