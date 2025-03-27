@@ -9,18 +9,20 @@ import { Roles } from 'src/decorators/roles.decorator';
 import { RolesEnum } from 'src/enums';
 import { UuidDto } from './dto/uuid.dto';
 
+
 @ApiTags('Properties')
 @ApiBearerAuth()
 @Controller('propertys')
-@UseGuards(JwtAuthGuard, AuthGuard)
-@Roles(RolesEnum.ADMIN)
 export class PropertiesController {
+
   constructor(private readonly propertiesService: PropertiesService) { }
-  
+
   @Post()
+  @UseGuards(JwtAuthGuard, AuthGuard)
+  @Roles(RolesEnum.ADMIN)
   @ApiOperation({ summary: 'Yangi property' })
   @ApiCreatedResponse({ description: 'yangi property yaratildi' })
-  @ApiBadRequestResponse({description:`Kiritilgan malumotlar xatoligi`})
+  @ApiBadRequestResponse({ description: `Kiritilgan malumotlar xatoligi` })
   @ApiBody({ type: CreatePropertyDto })
   create(@Body() createPropertyDto: CreatePropertyDto) {
     return this.propertiesService.create(createPropertyDto);
@@ -43,9 +45,11 @@ export class PropertiesController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard, AuthGuard)
+  @Roles(RolesEnum.ADMIN)
   @ApiOperation({ summary: 'Property id# bo`yicha yangilash' })
   @ApiOkResponse({ description: 'Property id# bo`yicha muvaffaqiyatli yangilandi' })
-  @ApiBadRequestResponse({description:`Yangilash uchun biror maydon kiriting`})
+  @ApiBadRequestResponse({ description: `Yangilash uchun biror maydon kiriting` })
   @ApiParam({ name: 'id', example: '123e4567-e89b-12d3-a456-426614174000', description: 'Property UUID' })
   @UsePipes(new ValidationPipe({ whitelist: true }))
   update(@Param() uuidDto: UuidDto, @Body() updatePropertyDto: UpdatePropertyDto) {
@@ -53,6 +57,8 @@ export class PropertiesController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard, AuthGuard)
+  @Roles(RolesEnum.ADMIN)
   @ApiOperation({ summary: 'Property id# bo`yicha o`chirish' })
   @ApiOkResponse({ description: 'Property id# bo`yicha muvaffaqiyatli o`chirildi' })
   @ApiParam({ name: 'id', example: '123e4567-e89b-12d3-a456-426614174000', description: 'Property UUID' })
