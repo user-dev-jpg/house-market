@@ -1,13 +1,15 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { EnvConfig, JwtConfig, TypeOrmConfig } from './configs';
-import { APP_INTERCEPTOR } from '@nestjs/core';
+import { EnvConfig, JwtConfig, ThrottlerConfig, TypeOrmConfig } from './configs';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { GloabalResponseFormatterInterceptors } from './interceptors/global-response.interceptor';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { PropertiesModule } from './modules/properties/properties.module';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+
 
 @Module({
   imports: [
@@ -17,6 +19,8 @@ import { PropertiesModule } from './modules/properties/properties.module';
 
     TypeOrmModule.forRootAsync(TypeOrmConfig),
 
+    ThrottlerModule.forRootAsync(ThrottlerConfig),
+
     UsersModule,
     AuthModule,
     PropertiesModule
@@ -25,9 +29,13 @@ import { PropertiesModule } from './modules/properties/properties.module';
   controllers: [],
   providers: [
     {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard
+    },
+    {
       provide: APP_INTERCEPTOR,
       useClass: GloabalResponseFormatterInterceptors
-    }
+    },
   ],
 })
 export class AppModule { }
