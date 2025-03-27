@@ -8,6 +8,8 @@ import { RolesEnum } from 'src/enums';
 import { ConfigService } from '@nestjs/config';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import { Throttle } from '@nestjs/throttler';
+
 
 @ApiTags('File Upload 📩')
 @ApiBearerAuth()
@@ -15,11 +17,11 @@ import { extname } from 'path';
 @Roles(RolesEnum.ADMIN)
 @Controller('files')
 export class FileUploadController {
-  constructor(
-    private readonly configService: ConfigService
-  ) { }
+
+  constructor(private readonly configService: ConfigService) { }
 
   @Post('upload')
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @ApiOperation({ summary: 'Fayl yuklash (image)' })
   @ApiConsumes('multipart/form-data') // Swagger multipart/form-data qo‘llab-quvvatlash
   @ApiBody({
