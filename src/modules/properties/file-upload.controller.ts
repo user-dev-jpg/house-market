@@ -63,6 +63,10 @@ export class FileUploadController {
 
   async fileUpload(@UploadedFile() file: Express.Multer.File) {
 
+    if (!file || !file.filename) {
+      throw new BadRequestException('Fayl yuklanmadi yoki noto‘g‘ri formatda!');
+    }
+
     const url: string = this.configService.get<string>('API_URL_1');
     return {
       message: 'Fayl yuklandi',
