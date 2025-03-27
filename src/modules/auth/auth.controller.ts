@@ -10,9 +10,11 @@ import {
   ApiUnauthorizedResponse, ApiOkResponse,
   ApiCreatedResponse
 } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 
 @ApiTags('Authentication')
 @Controller('auth')
+@Throttle({ default: { limit: 5, ttl: 60000 } })
 export class AuthController {
   constructor(private readonly authService: AuthService) { }
 
