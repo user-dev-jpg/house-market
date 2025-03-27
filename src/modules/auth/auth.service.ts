@@ -26,10 +26,8 @@ export class AuthService {
     try {
 
       const existingUser = await this.userRepo.findOne({
-        where: {
-          login: createUserDto.login,
-          email: createUserDto.email
-        }
+        select: ["id"], // Kerakli ustunlarni olamiz
+        where: { login: createUserDto.login }
       })
 
       if (existingUser) throw new ConflictException('Already existing user')
@@ -39,15 +37,16 @@ export class AuthService {
       const hashedPassword: string = await bcryptjs.hash(newUser.password, 8)
       newUser.password = hashedPassword
 
-      const [savedUser, token] = await Promise.all([
-        this.userRepo.save(newUser),
-        this.tokenService.generator(newUser)
-      ])
+      const savedUser = await this.userRepo.save(newUser);
+
+      const [token] = await Promise.all([
+        this.tokenService.generator(savedUser)
+      ]);
 
       const { password, role, ...user } = savedUser
 
       return {
-        user: user,
+        user,
         accessToken: token.accToken,
         accessExpiresIn: token.accessExpiresIn,
       }
