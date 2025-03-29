@@ -2,6 +2,9 @@ import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import * as CryptoJS from 'crypto-js';
 import { User } from "src/modules/users/entities/user.entity";
+import { of, firstValueFrom } from 'rxjs';
+import { map } from 'rxjs/operators';
+
 
 @Injectable()
 export class TokenGenerator {
@@ -15,6 +18,14 @@ export class TokenGenerator {
 		this.aesKey = process.env.AES_KEY || '';
 		this.accessTime = process.env.JWT_ACCESS_EXPIRES_TIME || '1m';
 		this.refreshTime = process.env.JWT_REFRESH_EXPIRES_TIME || '7d';
+	}
+
+	private async extractNumber(time: string): Promise<number> {
+		return firstValueFrom(
+			of(time).pipe(
+				map(value => parseInt(value.replace(/\D/g, ''), 10))
+			)
+		);
 	}
 
 	async generator(user: User)
@@ -40,12 +51,15 @@ export class TokenGenerator {
 			const encryptedAccToken = CryptoJS.AES.encrypt(accToken, this.aesKey).toString();
 			const encryptedRefToken = CryptoJS.AES.encrypt(refToken, this.aesKey).toString();
 
+			const accessNum = await this.extractNumber(this.accessTime);
+			const refreshNum = await this.extractNumber(this.refreshTime);
+
 			// vaqt qo'shish
 			const accessDate = new Date();
-			accessDate.setMinutes(accessDate.getMinutes() + Number(this.accessTime.split("")[0]));
+			accessDate.setMinutes(accessDate.getMinutes() + accessNum);
 
 			const refreshDate = new Date();
-			refreshDate.setDate(refreshDate.getDate() + Number(this.refreshTime.split("")[0]));
+			refreshDate.setDate(refreshDate.getDate() + refreshNum);
 
 			return {
 				accToken: encryptedAccToken,
