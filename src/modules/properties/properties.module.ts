@@ -7,10 +7,13 @@ import { UsersModule } from '../users/users.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { FileUploadController } from './file-upload.controller';
+import { PropDetails } from './entities/prop-details.entity';
+import { Attachments } from './entities/attachments.entity';
+import { Location } from './entities/location.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Property]),
+    TypeOrmModule.forFeature([Property, Location, PropDetails, Attachments]),
 
     forwardRef(() => UsersModule),
 
@@ -21,6 +24,6 @@ import { FileUploadController } from './file-upload.controller';
   ],
   controllers: [PropertiesController, FileUploadController],
   providers: [PropertiesService],
-  exports: [PropertiesService, TypeOrmModule.forFeature([Property]),]
+  exports: [PropertiesService, TypeOrmModule.forFeature([Property, Location, PropDetails, Attachments]),]
 })
 export class PropertiesModule { }
