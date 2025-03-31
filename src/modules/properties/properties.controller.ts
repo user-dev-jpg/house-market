@@ -18,8 +18,8 @@ export class PropertiesController {
   constructor(private readonly propertiesService: PropertiesService) { }
 
   @Post()
-  // @UseGuards(JwtAuthGuard, AuthGuard)
-  // @Roles(RolesEnum.ADMIN)
+  @UseGuards(JwtAuthGuard, AuthGuard)
+  @Roles(RolesEnum.ADMIN)
   @ApiOperation({ summary: 'Yangi property' })
   @ApiCreatedResponse({ description: 'yangi property yaratildi' })
   @ApiBadRequestResponse({ description: `Kiritilgan malumotlar xatoligi` })

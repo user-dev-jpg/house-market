@@ -17,31 +17,55 @@ export class PropertiesService {
     @InjectRepository(Location) private readonly locationRepo: Repository<Location>,
     @InjectRepository(PropDetails) private readonly propDetailsRepo: Repository<PropDetails>,
     private readonly dataSource: DataSource,
-    
+
   ) { }
 
-  async create(createPropertyDto: CreatePropertyDto): Promise<{ property: string }> {
+  async create(createPropertyDto: CreatePropertyDto): Promise<{ property: Property }> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
     try {
-      const newProperty = this.propertyRepo.create({
+      const property = this.propertyRepo.create({
         homeIndex: createPropertyDto.homeIndex,
         salePrice: createPropertyDto.salePrice,
         description: createPropertyDto.description,
         rooms: createPropertyDto.rooms,
       });
-      
-      const savedProperty = await this.propertyRepo.save(newProperty);
-      
-      
-      savedProperty.location = this.locationRepo.create({  })
-      
-      console.log(savedProperty);
-      // savedProperty.attachments = []
-      return { property: 'salom aka' }
-    } catch (error: any) {
-      throw error instanceof HttpException
-        ? error
-        : new HttpException(error.message, HttpStatus.BAD_REQUEST)
+
+      const savedProperty = await queryRunner.manager.save(property);
+
+      if (createPropertyDto.location) {
+        savedProperty.location = await queryRunner.manager.save(
+          this.locationRepo.create({ ...createPropertyDto.location, property: savedProperty["id"] })
+        );
+      }
+
+      if (createPropertyDto.propDetails) {
+        savedProperty.propDetails = await queryRunner.manager.save(
+          this.propDetailsRepo.create({ ...createPropertyDto.propDetails, property: savedProperty["id"] })
+        );
+      }
+
+      if (createPropertyDto.attachments?.length) {
+        savedProperty.attachments = await queryRunner.manager.save(
+          this.attachmentsRepo.create(
+            createPropertyDto.attachments.map(attachment => ({
+              imgPath: attachment.imgPath,
+              avatar: attachment.avatar,
+              property: savedProperty["id"],
+            }))
+          )
+        );
+      }
+
+      await queryRunner.commitTransaction();
+      return { property: await this.propertyRepo.save(savedProperty) };
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw new InternalServerErrorException('Property creation failed', error.message);
+    } finally {
+      await queryRunner.release();
     }
   }
 
