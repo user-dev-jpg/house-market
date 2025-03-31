@@ -35,10 +35,10 @@ export class UsersController {
   }
 
   @Patch()
-  @ApiOperation({ summary: 'User profile ni id# bo`yicha yangilash(parol alohida yangilanadi)' })
-  @ApiOkResponse({ description: 'User id# bo`yicha muvaffaqiyatli yangilandi' })
+  @ApiOperation({ summary: 'User profile ni token bo`yicha yangilash ( parol alohida yangilanadi, faqat token ozi yetarli)' })
+  @ApiOkResponse({ description: 'User token bo`yicha muvaffaqiyatli yangilandi' })
   @ApiBadRequestResponse({ description: `Yangilash uchun biror maydon kiriting` })
-  @ApiParam({ name: 'id', example: '123e4567-e89b-12d3-a456-426614174000', description: 'user UUID' })
+  // @ApiParam({ name: 'id', example: '123e4567-e89b-12d3-a456-426614174000', description: 'user UUID' })
   @UsePipes(new ValidationPipe({ whitelist: true }))
   update(@Req() req: Request, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(req?.user.id, updateUserDto);
