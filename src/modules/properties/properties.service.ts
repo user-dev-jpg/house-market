@@ -17,54 +17,31 @@ export class PropertiesService {
     @InjectRepository(Location) private readonly locationRepo: Repository<Location>,
     @InjectRepository(PropDetails) private readonly propDetailsRepo: Repository<PropDetails>,
     private readonly dataSource: DataSource,
+    
   ) { }
 
-  async create(createPropertyDto: CreatePropertyDto): Promise<{ property: Property }> {
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
+  async create(createPropertyDto: CreatePropertyDto): Promise<{ property: string }> {
 
     try {
-      const property = this.propertyRepo.create({
+      const newProperty = this.propertyRepo.create({
         homeIndex: createPropertyDto.homeIndex,
         salePrice: createPropertyDto.salePrice,
         description: createPropertyDto.description,
         rooms: createPropertyDto.rooms,
       });
-
-      const savedProperty = await queryRunner.manager.save(property);
-
-      if (createPropertyDto.location) {
-        savedProperty.location = await queryRunner.manager.save(
-          this.locationRepo.create({ ...createPropertyDto.location, property: savedProperty["id"] })
-        );
-      }
-
-      if (createPropertyDto.propDetails) {
-        savedProperty.propDetails = await queryRunner.manager.save(
-          this.propDetailsRepo.create({ ...createPropertyDto.propDetails, property: savedProperty["id"] })
-        );
-      }
-
-      if (createPropertyDto.attachments?.length) {
-        savedProperty.attachments = await queryRunner.manager.save(
-          this.attachmentsRepo.create(
-            createPropertyDto.attachments.map(attachment => ({
-              imgPath: attachment.imgPath,
-              avatar: attachment.avatar,
-              property: savedProperty["id"],
-            }))
-          )
-        );
-      }
-
-      await queryRunner.commitTransaction();
-      return { property: await this.propertyRepo.save(savedProperty) };
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-      throw new InternalServerErrorException('Property creation failed', error.message);
-    } finally {
-      await queryRunner.release();
+      
+      const savedProperty = await this.propertyRepo.save(newProperty);
+      
+      
+      savedProperty.location = this.locationRepo.create({  })
+      
+      console.log(savedProperty);
+      // savedProperty.attachments = []
+      return { property: 'salom aka' }
+    } catch (error: any) {
+      throw error instanceof HttpException
+        ? error
+        : new HttpException(error.message, HttpStatus.BAD_REQUEST)
     }
   }
 
@@ -112,17 +89,17 @@ export class PropertiesService {
   // update property
   async update(id: string, updatePropertyDto: UpdatePropertyDto): Promise<string> {
     try {
-      
+
       const property = await this.propertyRepo.findOne({
         where: { id },
         relations: ["attachments", "location", "propDetails"]
       });
-  
+
       if (!property) {
         throw new NotFoundException('Property not found');
       }
       console.log(property);
-      
+
       return `salom uka`
     } catch (error: any) {
       throw error instanceof HttpException
@@ -130,8 +107,6 @@ export class PropertiesService {
         : new HttpException(error.message, HttpStatus.BAD_REQUEST)
     }
   }
-  
-
 
 
   // delete property
