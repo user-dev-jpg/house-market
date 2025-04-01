@@ -35,7 +35,7 @@ export class PropDetails implements IPropDetails {
 	@Column({ type: "text" })
 	type: string;
 
-	@OneToOne(() => Property, (property) => property.propDetails)
+	@OneToOne(() => Property, (property) => property.propDetails, {onDelete:"CASCADE"})
 	@JoinColumn()
 	property:Property["id"]
 

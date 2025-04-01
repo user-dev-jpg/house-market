@@ -29,7 +29,7 @@ export class Location implements ILocation {
 	@Column({ type: "text" })
 	country: string;
 
-	@OneToOne(() => Property, (property) => property.location)
+	@OneToOne(() => Property, (property) => property.location, {onDelete:"CASCADE"})
 	@JoinColumn()
 	property: Property["id"]
 }

@@ -4,8 +4,6 @@ import { PropertiesController } from './properties.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Property } from './entities/property.entity';
 import { UsersModule } from '../users/users.module';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
 import { PropDetails } from './entities/prop-details.entity';
 import { Attachments } from './entities/attachments.entity';
 import { Location } from './entities/location.entity';
@@ -16,10 +14,6 @@ import { Location } from './entities/location.entity';
 
     forwardRef(() => UsersModule),
 
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'uploads'),
-      serveRoot: '/uploads',
-    }),
   ],
   controllers: [PropertiesController,],
   providers: [PropertiesService],

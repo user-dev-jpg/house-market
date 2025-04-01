@@ -5,7 +5,7 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { AuthGuard } from '../../common/guards/role.guard';
 import { Roles } from '../../decorators/roles.decorator';
 import { RolesEnum } from '../../enums';
-import { ApiBadRequestResponse, ApiBearerAuth, ApiForbiddenResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiForbiddenResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 
 
@@ -38,7 +38,11 @@ export class UsersController {
   @ApiOperation({ summary: 'User profile ni token bo`yicha yangilash ( parol alohida yangilanadi, faqat token ozi yetarli)' })
   @ApiOkResponse({ description: 'User token bo`yicha muvaffaqiyatli yangilandi' })
   @ApiBadRequestResponse({ description: `Yangilash uchun biror maydon kiriting` })
-  // @ApiParam({ name: 'id', example: '123e4567-e89b-12d3-a456-426614174000', description: 'user UUID' })
+  @ApiBody({
+    description: 'Foydalanuvchi ma\'lumotlarini yangilash uchun kerakli maydonlar.',
+    type: UpdateUserDto,
+  }
+  )
   @UsePipes(new ValidationPipe({ whitelist: true }))
   update(@Req() req: Request, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(req?.user.id, updateUserDto);

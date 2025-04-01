@@ -14,7 +14,7 @@ export class Attachments implements IAttachments {
 	@Column({ type: "text" })
 	avatar: string;
 
-	@ManyToOne(() => Property, (property) => property.attachments)
+	@ManyToOne(() => Property, (property) => property.attachments, {onDelete:"CASCADE"})
 	property: Property["id"]
 
 }

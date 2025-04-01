@@ -1,3 +1,4 @@
+import { UpdateAttachmentDto } from './dto/update-attachments-dto';
 import { BadRequestException, HttpException, HttpStatus, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
@@ -8,6 +9,8 @@ import { Location } from './entities/location.entity';
 import { CreatePropertyDto } from './dto/create-property.dto';
 import { UpdatePropertyDto } from './dto/update-property.dto';
 import { CreateAttachmentsDto } from './dto/create-attachments-dto';
+import { UpdateLocationDto } from './dto/update-location-dto';
+import { UpdatePropDetailsDto } from './dto/update-prop-details.dto';
 
 @Injectable()
 export class PropertiesService {
@@ -114,6 +117,10 @@ export class PropertiesService {
   async update(id: string, updatePropertyDto: UpdatePropertyDto): Promise<string> {
     try {
 
+      if (!updatePropertyDto || Object.keys(updatePropertyDto).length === 0) {
+        throw new BadRequestException(`Yangilash uchun biror maydon kiriting`)
+      }
+
       const property = await this.propertyRepo.findOne({
         where: { id },
         relations: ["attachments", "location", "propDetails"]
@@ -122,9 +129,78 @@ export class PropertiesService {
       if (!property) {
         throw new NotFoundException('Property not found');
       }
-      console.log(property);
+      const { affected } = await this.propertyRepo.update(id, updatePropertyDto)
 
-      return `salom uka`
+      return affected && affected > 0 ? `Muvaffaqiyatli yangilandi` : `Yangilash amalga oshmadi`
+    } catch (error: any) {
+      throw error instanceof HttpException
+        ? error
+        : new HttpException(error.message, HttpStatus.BAD_REQUEST)
+    }
+  }
+
+  // update attachments
+  async updateAttachments(id: string, updateAttachmentDto: UpdateAttachmentDto): Promise<string> {
+    try {
+      if (!updateAttachmentDto || Object.keys(updateAttachmentDto).length === 0) {
+        throw new BadRequestException(`Yangilash uchun biror maydon kiriting`)
+      }
+
+      const attachments = await this.attachmentsRepo.findOne({ where: { id } })
+
+      if (!attachments) {
+        throw new NotFoundException('attachment not found');
+      }
+      const { affected } = await this.attachmentsRepo.update(id, updateAttachmentDto)
+
+
+      return affected && affected > 0 ? `Muvaffaqiyatli yangilandi` : `Yangilash amalga oshmadi`
+    } catch (error: any) {
+      throw error instanceof HttpException
+        ? error
+        : new HttpException(error.message, HttpStatus.BAD_REQUEST)
+    }
+  }
+
+
+  // update location
+  async updateLocation(id: string, updateLocationDto: UpdateLocationDto): Promise<string> {
+    try {
+      if (!updateLocationDto || Object.keys(updateLocationDto).length === 0) {
+        throw new BadRequestException(`Yangilash uchun biror maydon kiriting`)
+      }
+
+      const location = await this.locationRepo.findOne({ where: { id } })
+
+      if (!location) {
+        throw new NotFoundException('location not found');
+      }
+      const { affected } = await this.locationRepo.update(id, updateLocationDto)
+
+      return affected && affected > 0 ? `Muvaffaqiyatli yangilandi` : `Yangilash amalga oshmadi`
+    } catch (error: any) {
+      throw error instanceof HttpException
+        ? error
+        : new HttpException(error.message, HttpStatus.BAD_REQUEST)
+    }
+  }
+
+
+  // update Prop Details
+  async updatePropDetails(id: string, updatePropDetailsDto: UpdatePropDetailsDto): Promise<string> {
+    try {
+      if (!updatePropDetailsDto || Object.keys(updatePropDetailsDto).length === 0) {
+        throw new BadRequestException(`Yangilash uchun biror maydon kiriting`)
+      }
+
+      const propDetails = await this.propDetailsRepo.findOne({ where: { id } })
+
+      if (!propDetails) {
+        throw new NotFoundException('Prop Details #id not found');
+      }
+      const { affected } = await this.propDetailsRepo.update(id, updatePropDetailsDto)
+
+      return affected && affected > 0 ? `Muvaffaqiyatli yangilandi` : `Yangilash amalga oshmadi`
     } catch (error: any) {
       throw error instanceof HttpException
         ? error
@@ -134,16 +210,21 @@ export class PropertiesService {
 
 
   // delete property
-  async remove(id: string) {
+  async remove(id: string): Promise<string> {
     try {
-      const property = await this.propertyRepo.findOne({ where: { id } })
+      const property = await this.propertyRepo.findOne({
+        where: { id },
+        relations: ['attachments', 'location', 'propDetails'], // Barcha bog‘langan entitylarni olish
+      });
+      console.log(property);
+      
       if (!property) {
         throw new NotFoundException('not found property')
       }
 
-      const { affected } = await this.propertyRepo.delete(id)
+      await this.propertyRepo.remove(property);
 
-      return affected && affected > 0 ? `Succfully deleted!` : `Delete filed`
+      return `Succfully deleted!`
     } catch (error: any) {
       throw error instanceof HttpException
         ? error

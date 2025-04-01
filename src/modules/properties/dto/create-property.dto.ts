@@ -5,7 +5,7 @@ import { CreateAttachmentsDto } from "./create-attachments-dto";
 import { CreateLocationDto } from "./create-location.dto";
 import { CreatePropDetailsDto } from "./create-prop-details.dto";
 
-export class CreatePropertyDto {
+export class CreatePropertyDto {    
 	@ApiProperty({ example: 329, description: "Property home index" })
 	@IsInt()
 	homeIndex: number;

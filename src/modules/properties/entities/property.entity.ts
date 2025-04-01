@@ -21,14 +21,14 @@ export class Property {
 	@Column({ type: "int" })
 	rooms: number
 
-	@OneToMany(() => Attachments, (attachments) => attachments.property, { cascade: true })
+	@OneToMany(() => Attachments, (attachments) => attachments.property, { cascade: true, onDelete: "CASCADE" })
 	attachments: Attachments[]
 
-	@OneToOne(() => Location, (location) => location.property, { cascade: true })
+	@OneToOne(() => Location, (location) => location.property, { cascade: true, onDelete: "CASCADE" })
 	@JoinColumn()
 	location: Location
 
-	@OneToOne(() => PropDetails, (propDetails) => propDetails.property, { cascade: true })
+	@OneToOne(() => PropDetails, (propDetails) => propDetails.property, { cascade: true, onDelete: "CASCADE" })
 	@JoinColumn()
 	propDetails: PropDetails
 
