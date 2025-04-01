@@ -95,15 +95,19 @@ export class PropertiesService {
   // get one property by id
   async findOne(id: string): Promise<{ property: Property }> {
     try {
+      const property = await this.propertyRepo.findOne({
+        where: { id },
+        relations: {
+          attachments: true,
+          location: true,
+          propDetails: true
+        }
+      });
+
+      if (!property) throw new NotFoundException()
+
       return {
-        property: await this.propertyRepo.findOne({
-          where: { id },
-          relations: {
-            attachments: true,
-            location: true,
-            propDetails: true
-          }
-        })
+        property: property
       }
     } catch (error: any) {
       throw error instanceof HttpException
@@ -217,7 +221,7 @@ export class PropertiesService {
         relations: ['attachments', 'location', 'propDetails'], // Barcha bog‘langan entitylarni olish
       });
       console.log(property);
-      
+
       if (!property) {
         throw new NotFoundException('not found property')
       }

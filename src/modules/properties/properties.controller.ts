@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UsePipes,
 import { PropertiesService } from './properties.service';
 import { CreatePropertyDto } from './dto/create-property.dto';
 import { UpdatePropertyDto } from './dto/update-property.dto';
-import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiForbiddenResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiForbiddenResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { AuthGuard } from 'src/common/guards/role.guard';
 import { Roles } from 'src/decorators/roles.decorator';
@@ -42,6 +42,7 @@ export class PropertiesController {
   @Get(':id')
   @ApiOperation({ summary: 'Property id# bo`yicha' })
   @ApiOkResponse({ description: 'Property id# bo`yicha muvaffaqiyatli olindi' })
+  @ApiNotFoundResponse({ description: 'Property id# topilmadi' })
   @ApiParam({ name: 'id', example: '123e4567-e89b-12d3-a456-426614174000', description: 'Property UUID' })
   @UsePipes(new ValidationPipe({ whitelist: true }))
   findOne(@Param() uuidDto: UuidDto) {
