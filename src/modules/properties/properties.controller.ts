@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UsePipes, ValidationPipe, Query } from '@nestjs/common';
 import { PropertiesService } from './properties.service';
 import { CreatePropertyDto } from './dto/create-property.dto';
 import { UpdatePropertyDto } from './dto/update-property.dto';
@@ -38,6 +38,19 @@ export class PropertiesController {
   findAll() {
     return this.propertiesService.findAll();
   }
+
+
+  @Get('search')
+  @ApiOperation({ summary: 'Propertyni qidirish' })
+  @ApiOkResponse({ description: 'Property muvaffaqiyatli olindi' })
+  searchProperty(
+    @Query('zipcode') zipcode?: string,
+    @Query('city') city?: string,
+    @Query('address') address?: string
+  ) {
+    return this.propertiesService.searchProperty({ zipcode, city, address });
+  }
+
 
   @Get(':id')
   @ApiOperation({ summary: 'Property id# bo`yicha' })

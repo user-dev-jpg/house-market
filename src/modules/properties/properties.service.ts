@@ -1,7 +1,7 @@
 import { UpdateAttachmentDto } from './dto/update-attachments-dto';
 import { BadRequestException, HttpException, HttpStatus, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DataSource } from 'typeorm';
+import { Repository, DataSource, ILike } from 'typeorm';
 import { Property } from './entities/property.entity';
 import { Attachments } from './entities/attachments.entity';
 import { PropDetails } from './entities/prop-details.entity';
@@ -85,6 +85,98 @@ export class PropertiesService {
           }
         })
       }
+    } catch (error: any) {
+      throw error instanceof HttpException
+        ? error
+        : new HttpException(error.message, HttpStatus.BAD_REQUEST)
+    }
+  }
+
+
+  // all propertys  
+  async searchProperty({ zipcode, city, address }): Promise<{ property: Property }> {
+    try {
+
+      if (!zipcode && !city && !address) throw new BadRequestException(`Biror qiymat kiriting`)
+
+      // if zipcode
+      if (zipcode) {
+        
+        if (zipcode.trim() === "") {
+          throw new NotFoundException("Zipcode value is required and cannot be empty.");
+        }
+
+        zipcode = Number(zipcode)
+
+        if (typeof zipcode !== "number" || isNaN(zipcode)) {
+          throw new BadRequestException('Akasi zipcode ga raqam kiritish kerak 😎')
+        }
+
+        if (zipcode.toString().length !== 5) throw new BadRequestException('5 ta raqam kiritib yuboring hammasi yaxshi bop ketadi 😉')
+
+        const property = await this.propertyRepo.findOne({
+          where: { location: { zipcode } },
+          relations: {
+            attachments: true,
+            location: true,
+            propDetails: true
+          }
+        });
+
+        if (!property) throw new NotFoundException()
+
+        return {
+          property
+        }
+      }
+
+      // if city
+      if (city) {
+        
+        if (city.trim() === "") {
+          throw new NotFoundException("City value is required and cannot be empty.");
+        }
+
+        const property = await this.propertyRepo.findOne({
+          relations: ['attachments', 'location', 'propDetails'],
+          where: {
+            location: {
+              city: ILike(`%${city}%`)
+            }
+          }
+        });
+
+        if (!property) {
+          throw new NotFoundException("Property not found");
+        }
+
+        return { property };
+      }
+
+      // if address
+      if (address) {
+
+        if (address.trim() === "") {
+          throw new NotFoundException("Address value is required and cannot be empty.");
+        }
+
+        const property = await this.propertyRepo.findOne({
+          relations: ['attachments', 'location', 'propDetails'],
+          where: {
+            location: {
+              address: ILike(`%${address}%`)
+            }
+          }
+        });
+
+        if (!property) {
+          throw new NotFoundException("Property not found");
+        }
+
+        return { property };
+      }
+
+
     } catch (error: any) {
       throw error instanceof HttpException
         ? error
