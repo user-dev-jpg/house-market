@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UsePipes,
 import { PropertiesService } from './properties.service';
 import { CreatePropertyDto } from './dto/create-property.dto';
 import { UpdatePropertyDto } from './dto/update-property.dto';
-import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiForbiddenResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiForbiddenResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { AuthGuard } from 'src/common/guards/role.guard';
 import { Roles } from 'src/decorators/roles.decorator';
@@ -42,7 +42,15 @@ export class PropertiesController {
 
   @Get('search')
   @ApiOperation({ summary: 'Propertyni qidirish' })
-  @ApiOkResponse({ description: 'Property muvaffaqiyatli olindi' })
+  @ApiQuery({ name: 'zipcode', required: false, description: 'Pochta kodi (ZIP Code)' })
+  @ApiQuery({ name: 'city', required: false, description: 'Shahar nomi' })
+  @ApiQuery({ name: 'address', required: false, description: 'Ko‘cha manzili' })
+  @ApiOkResponse({
+    description: 'Property muvaffaqiyatli olindi',
+    type:"zipcode?: string",
+    isArray: true
+  })
+  @ApiBadRequestResponse({ description: 'Noto‘g‘ri so‘rov' })
   searchProperty(
     @Query('zipcode') zipcode?: string,
     @Query('city') city?: string,
